@@ -1,0 +1,127 @@
+{
+    "anos_inversion": 5,
+    "tasa_cambio_usd_mxn": 20,
+    "tasa_inflacion_anual": 5,
+    "hrs_vuelo_nacionales_anual": 200,
+    "hrs_vuelo_extranjero_anual": 100,
+    "costo_turbocina_mex_lt": 15,
+    "costo_turbocina_usa_gal": 6.37,
+    "turbocina_mex_lt_hora": 741,
+    "turbocina_usa_gal_hora": 196,
+    "montores_cantidad": 2,
+    "programa_motor_anual": 110730,
+
+    "costo_mtto_programado_total_anual": 356600,
+    "costo_mtto_programado_total_anual_inflacion": 0,
+
+    "reserva_mtto_programado_anual": 0,
+    "reserva_mtto_discrepancias_anual": 0,
+    "reserva_mtto_interiores_anual": 0,
+    "reserva_mtto_total_anual": 0,
+    "reserva_mtto_total_anual_por_hora": 0,
+
+    "reserva_capacitacion_pilotos_anual": 81120,
+    "administracion_anual": 102000,
+
+    "sueldo_piloto_pic_anual": 100449,
+    "sueldo_piloto_sic_anual": 79974,
+
+    "guardia_hangar_anual": 78000,
+    "seguro_aeronave_anual": 29881,
+
+    "arrendamiento_anual": 235200,
+    "precio_venta_aeronave": 2500000,
+
+
+
+    "Horas_de_Vuelo_al_Anio": "300 Hrs/Vlo",
+    "Horas_de_Vuelo_al_Mes": "25 Hrs/Vlo",
+    "CF_x_Hra_Vlo": {
+        "currency": "usd",
+        "value": 2634
+    },
+    "CV_x_Hra_Vlo": {
+        "currency": "usd",
+        "value": 1737
+    },
+    "Comisiones_TA_por_Hr_Vlo": {
+        "currency": "usd",
+        "value": null
+    },
+    "Comisiones_Tripulacion_por_Hr_Vlo": {
+        "currency": "usd",
+        "value": null
+    },
+    "CoGa_CF_CV_x_Hra_Vlo": {
+        "currency": "usd",
+        "value": 4371
+    },
+    "Porcentaje_Vuelos_Nacionales": "60 %",
+    "Porcentaje_Vuelos_Extranjero": "40 %",
+    "Turbosina_Lts_MEX": {
+        "currency": "mxn",
+        "value": 15.00
+    },
+    "Turbosina_Gal_USA": {
+        "currency": "usd",
+        "value": 6.37
+    },
+    "TdeC": {
+        "currency": "usd",
+        "value": 20.0000
+    },
+    "Turbosina_Lts_MEX_por_Hra": "741 Lts/Hra",
+    "Turbosina_Gal_USA_por_Hra": "196 Gal/Hra",
+    "Programa_de_Motores_Minimo": "150 Hrs/Vlo",
+    "Rate_MSP_Gold": {
+        "Rate_Basico": null,
+        "Anio_2023": {
+            "currency": "usd",
+            "value": 316.32
+        },
+        "Anio_2024": {
+            "currency": "usd",
+            "value": 358.35
+        },
+        "Anio_2025": {
+            "currency": "usd",
+            "value": 369.10
+        }
+    },
+    "Rva_de_Mantenimiento_Programado": {
+        "currency": "usd",
+        "value": 83681
+    },
+    "Rva_de_Mantenimiento_Discrepancias": {
+        "currency": "usd",
+        "value": 40000
+    },
+    "Rva_para_conservacion_de_Interiores": {
+        "currency": "usd",
+        "value": 10000
+    },
+    "Reserva_Total_anual": {
+        "currency": "usd",
+        "value": 133681
+    },
+    "Rva_por_Hr_Vlo": {
+        "currency": "usd",
+        "value": 445.60
+    },
+    "Comisiones_TA_por_Hr_Vlo_footer": {
+        "currency": "usd",
+        "value": null
+    },
+    "Comisiones_TA_anuales": {
+        "currency": "usd",
+        "value": null
+    },
+    "Comisiones_Tripulacion_por_Hr_Vlo_footer": {
+        "currency": "usd",
+        "value": null
+    },
+    "Comisiones_TA_anuales_footer": {
+        "currency": "usd",
+        "value": null
+    }
+}
