@@ -16,6 +16,8 @@ export default defineComponent({
       // Tasas y cambios
       tasa_cambio_usd_mxn: params.tasa_cambio_usd_mxn,
       tasa_inflacion_anual: params.tasa_inflacion_anual,
+      tasa_inflacion_usa: params.tasa_inflacion_usa,
+      tasa_depreciacion_anual: params.tasa_depreciacion_anual,
       
       // Horas de vuelo
       hrs_vuelo_nacionales_anual: params.hrs_vuelo_nacionales_anual,
@@ -136,8 +138,12 @@ export default defineComponent({
     const costoMttoInflacionPorAnio = computed(() => {
       const years = formData.anos_inversion
       const baseCost = formData.costo_mtto_programado_total_anual / years
-      const inflationRate = 0 // formData.tasa_inflacion_anual / 100
+      const inflationUSARate = formData.tasa_inflacion_usa / 100
       const yearlyCosts = []
+
+      console.log('🚀 ---------------------------------------------------🚀')
+      console.log('🚀 ~ costoMttoInflacionPorAnio ~ baseCost:', baseCost)
+      console.log('🚀 ---------------------------------------------------🚀')
 
       // Add year 0 (base cost without inflation)
       yearlyCosts.push({
@@ -150,7 +156,7 @@ export default defineComponent({
 
       // Add years 1 to N with inflation
       for (let year = 1; year <= years - 1; year++) {
-        const inflatedCost: number = (yearlyCosts[year - 1]?.costo || 0) * (1 + inflationRate)
+        const inflatedCost: number = (yearlyCosts[year - 1]?.costo || 0) * (1 + inflationUSARate)
         yearlyCosts.push({
           anio: year,
           costo: inflatedCost,
@@ -159,6 +165,10 @@ export default defineComponent({
           incrementoFormateado: formatCurrency(inflatedCost - baseCost)
         })
       }
+
+      console.log('🚀 -----------------------------------------------------------------🚀')
+      console.log('🚀 ~ constcostoMttoInflacionPorAnio=computed ~ yearlyCosts:', yearlyCosts)
+      console.log('🚀 -----------------------------------------------------------------🚀')
 
       return yearlyCosts
     })
@@ -194,8 +204,14 @@ export default defineComponent({
     // Reactive formatted data for display
     const formattedData = reactive({
       tasa_cambio_usd_mxn: params.tasa_cambio_usd_mxn.toString(),
+      tasa_inflacion_usa: params.tasa_inflacion_usa.toString(),
+      tasa_depreciacion_anual: params.tasa_depreciacion_anual.toString(),
       costo_turbocina_mex_lt: params.costo_turbocina_mex_lt.toString(),
       costo_turbocina_usa_gal: params.costo_turbocina_usa_gal.toString(),
+      turbocina_mex_lt_hora: params.turbocina_mex_lt_hora.toString(),
+      turbocina_usa_gal_hora: params.turbocina_usa_gal_hora.toString(),
+      programa_motor_anual: params.programa_motor_anual.toString(),
+      montores_cantidad: params.montores_cantidad.toString(),
       costo_mtto_programado_total_anual: params.costo_mtto_programado_total_anual.toString(),
       reserva_mtto_programado_anual: params.reserva_mtto_programado_anual.toString(),
       reserva_mtto_discrepancias_anual: params.reserva_mtto_discrepancias_anual.toString(),
@@ -389,11 +405,28 @@ export default defineComponent({
       return formData.precio_venta_aeronave + costo_total
     })
 
+    /**
+     * Calcula el valor residual de un activo utilizando el método de depreciación de saldo decreciente.
+     * @param {number} purchasePrice El precio de compra original del activo.
+     * @param {number} depreciationRate La tasa de depreciación anual en porcentaje (ej. 8 para 8%).
+     * @param {number} ownershipYears El número de años de posesión.
+     * @returns {number} El valor residual estimado del activo.
+     */
+    function calculateResaleValue(purchasePrice: number, depreciationRate: number, ownershipYears: number) {
+      const rateDecimal = depreciationRate / 100;
+      const valorDepreciableAnual = purchasePrice * rateDecimal
+      const valorDepreciableTotal = valorDepreciableAnual * ownershipYears
+      const resaleValue = purchasePrice - valorDepreciableTotal
+
+      return resaleValue;
+    }
+
     const calc_resale_value = computed(() => {
       const purchasePrice = formData.precio_venta_aeronave
-      const depreciationRate = 8
+      const depreciationRate = formData.tasa_depreciacion_anual
       const ownershipYears = formData.anos_inversion
-      const resaleValue = purchasePrice * Math.pow(1 - depreciationRate / 100, ownershipYears)
+      const resaleValue = calculateResaleValue(purchasePrice, depreciationRate, ownershipYears)
+
       return resaleValue
     })
 
@@ -410,7 +443,7 @@ export default defineComponent({
       const calc_ingresos_renta_anual = arrendamiento_anual * formData.anos_inversion
 
       const purchasePrice = formData.precio_venta_aeronave
-      const depreciationRate = 8
+      const depreciationRate = formData.tasa_depreciacion_anual
       const ownershipYears = formData.anos_inversion
       const resaleValue = purchasePrice * Math.pow(1 - depreciationRate / 100, ownershipYears)
       const calc_resale_value = resaleValue
@@ -446,6 +479,14 @@ export default defineComponent({
 
     const calc_diferencia_paquete_hrs_inversion = computed(() => {
       return paqueteHrsVueloTotal.value - calc_inversion_final.value
+    })
+
+    const calc_beneficio_fiscal = computed(() => {
+      const costo_total = totalCostoAnualConInflacionPorAnio.value.reduce((acc: number, curr: any) => acc + curr.costo, 0)
+      const beneficio_aeronave = formData.precio_venta_aeronave * 0.3
+      const beneficio_costo = costo_total * 0.3
+      const beneficio_total = beneficio_aeronave + beneficio_costo
+      return beneficio_total
     })
 
     return {
@@ -484,7 +525,8 @@ export default defineComponent({
       calc_costo_seguro_hr,
       paqueteHrsVuelo,
       paqueteHrsVueloTotal,
-      calc_diferencia_paquete_hrs_inversion
+      calc_diferencia_paquete_hrs_inversion,
+      calc_beneficio_fiscal
     }
   },
 })
