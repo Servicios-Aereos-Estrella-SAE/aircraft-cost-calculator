@@ -995,6 +995,52 @@ $radius: 12px;
   }
 }
 
+// Estilos para campos readonly
+.form-input.readonly {
+  background: #f8f9fa !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  color: #6c757d !important;
+  cursor: not-allowed;
+  
+  &:focus {
+    outline: none !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: none !important;
+  }
+  
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    cursor: not-allowed;
+  }
+}
+
+// Estilos adicionales para los inputs de porcentaje
+.input-group {
+  .input-wrapper {
+    &.percentage-input {
+      .form-input {
+        text-align: center;
+        font-weight: 500;
+      }
+      
+      .input-suffix {
+        font-weight: 600;
+        color: #495057;
+      }
+    }
+  }
+  
+  .input-hint {
+    font-weight: 400;
+    color: #6c757d;
+    
+    &.calculated-hint {
+      color: #28a745;
+      font-weight: 500;
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .configuration-forms {

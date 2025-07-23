@@ -312,24 +312,65 @@
           <div class="form-section">
             <h2>Horas de Vuelo</h2>
             <div class="form-grid">
+              <!-- Configuración por Horas Totales y Porcentajes -->
               <div class="input-group edited">
-                <label for="hrs_vuelo_nacionales_anual">Horas de Vuelo Nacionales Anual</label>
+                <label for="horas_totales">Horas Totales Anuales</label>
+                <div class="input-wrapper">
+                  <span class="icon">🕐</span>
+                  <input id="horas_totales" type="number"
+                    v-model.number="horasConfig.horas_totales"
+                    class="form-input" />
+                </div>
+                <small class="input-hint">Total de horas de vuelo al año</small>
+              </div>
+              
+              <div class="input-group edited">
+                <label for="porcentaje_hrs_nacionales">Porcentaje Horas Nacionales</label>
+                <div class="input-wrapper">
+                  <span class="icon">
+                    %
+                  </span>
+                  <input id="porcentaje_hrs_nacionales" type="number" min="0" max="100"
+                    :value="horasConfig.porcentaje_hrs_nacionales"
+                    @input="actualizarPorcentaje('nacionales', $event.target.value)"
+                    class="form-input" />
+                </div>
+                <small class="input-hint">{{ formData.hrs_vuelo_nacionales_anual }} horas</small>
+              </div>
+              
+              <div class="input-group edited">
+                <label for="porcentaje_hrs_extranjero">Porcentaje Horas Internacionales</label>
+                <div class="input-wrapper">
+                  <span class="icon">
+                    %
+                  </span>
+                  <input id="porcentaje_hrs_extranjero" type="number" min="0" max="100"
+                    :value="horasConfig.porcentaje_hrs_extranjero"
+                    @input="actualizarPorcentaje('extranjero', $event.target.value)"
+                    class="form-input" />
+                </div>
+                <small class="input-hint">{{ formData.hrs_vuelo_extranjero_anual }} horas</small>
+              </div>
+              
+              <!-- Campos calculados automáticamente (solo lectura) -->
+              <!-- <div class="input-group" h>
+                <label for="hrs_vuelo_nacionales_anual">Horas de Vuelo Nacionales Anual (Calculado)</label>
                 <div class="input-wrapper">
                   <span class="icon">✈</span>
                   <input id="hrs_vuelo_nacionales_anual" type="number"
                     v-model.number="formData.hrs_vuelo_nacionales_anual"
-                    @input="updateParam('hrs_vuelo_nacionales_anual', $event.target.value)" class="form-input" />
+                    readonly class="form-input readonly" />
                 </div>
               </div>
-              <div class="input-group edited">
-                <label for="hrs_vuelo_extranjero_anual">Horas de Vuelo Extranjero Anual</label>
+              <div class="input-group">
+                <label for="hrs_vuelo_extranjero_anual">Horas de Vuelo Extranjero Anual (Calculado)</label>
                 <div class="input-wrapper">
                   <span class="icon">○</span>
                   <input id="hrs_vuelo_extranjero_anual" type="number"
                     v-model.number="formData.hrs_vuelo_extranjero_anual"
-                    @input="updateParam('hrs_vuelo_extranjero_anual', $event.target.value)" class="form-input" />
+                    readonly class="form-input readonly" />
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
 

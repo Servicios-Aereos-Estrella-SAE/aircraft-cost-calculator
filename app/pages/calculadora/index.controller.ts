@@ -8,6 +8,13 @@ export default defineComponent({
     const factorS600HrsMttoDiscrepancias = 80000 / 600
     const factorS600HrsMttoInteriores = 20000 / 600
 
+    // Campos adicionales para cálculo de horas por porcentaje
+    const horasConfig = reactive({
+      horas_totales: params.hrs_vuelo_nacionales_anual + params.hrs_vuelo_extranjero_anual,
+      porcentaje_hrs_nacionales: 60, // Porcentaje por defecto
+      porcentaje_hrs_extranjero: 40  // Porcentaje por defecto
+    })
+
     // Reactive form data
     const formData = reactive({
       // Años de inversión
@@ -19,7 +26,7 @@ export default defineComponent({
       tasa_inflacion_usa: params.tasa_inflacion_usa,
       tasa_depreciacion_anual: params.tasa_depreciacion_anual,
       
-      // Horas de vuelo
+      // Horas de vuelo (se calcularán automáticamente)
       hrs_vuelo_nacionales_anual: params.hrs_vuelo_nacionales_anual,
       hrs_vuelo_extranjero_anual: params.hrs_vuelo_extranjero_anual,
       
@@ -57,6 +64,32 @@ export default defineComponent({
       arrendamiento_anual: params.arrendamiento_anual,
       precio_venta_aeronave: params.precio_venta_aeronave
     })
+
+    // Función para calcular horas basándose en porcentajes
+    const calcularHorasPorPorcentaje = () => {
+      const horasTotales = horasConfig.horas_totales || 0
+      formData.hrs_vuelo_nacionales_anual = Math.round((horasTotales * horasConfig.porcentaje_hrs_nacionales) / 100)
+      formData.hrs_vuelo_extranjero_anual = Math.round((horasTotales * horasConfig.porcentaje_hrs_extranjero) / 100)
+    }
+
+    // Función para actualizar porcentajes y asegurar que sumen 100%
+    const actualizarPorcentaje = (tipo: 'nacionales' | 'extranjero', valor: number) => {
+      // Limitar el valor entre 0 y 100
+      valor = Math.max(0, Math.min(100, valor))
+      
+      if (tipo === 'nacionales') {
+        horasConfig.porcentaje_hrs_nacionales = valor
+        horasConfig.porcentaje_hrs_extranjero = 100 - valor
+      } else {
+        horasConfig.porcentaje_hrs_extranjero = valor
+        horasConfig.porcentaje_hrs_nacionales = 100 - valor
+      }
+    }
+
+    // Watchers para calcular automáticamente las horas basándose en porcentajes
+    watch([() => horasConfig.horas_totales, () => horasConfig.porcentaje_hrs_nacionales, () => horasConfig.porcentaje_hrs_extranjero], () => {
+      calcularHorasPorPorcentaje()
+    }, { immediate: true })
 
     const paqueteHrsVuelo = computed(() => {
       const hrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
@@ -491,6 +524,7 @@ export default defineComponent({
     return {
       formData,
       formattedData,
+      horasConfig,
       costo_mtto_programado_total_anual_inflacion,
       formattedCostoMttoInflacion,
       costoMttoInflacionPorAnio,
@@ -525,7 +559,9 @@ export default defineComponent({
       paqueteHrsVuelo,
       paqueteHrsVueloTotal,
       calc_diferencia_paquete_hrs_inversion,
-      calc_beneficio_fiscal
+      calc_beneficio_fiscal,
+      actualizarPorcentaje,
+      calcularHorasPorPorcentaje
     }
   },
 })
