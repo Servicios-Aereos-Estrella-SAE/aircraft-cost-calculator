@@ -2,18 +2,23 @@
   <NuxtLayout>
     <div class="configuration-forms">
       <div class="form-container">
-        <NuxtLink to="/">
+        <!-- <NuxtLink to="/">
           <button class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i>
             version 1
           </button>
-        </NuxtLink>
+        </NuxtLink> -->
         <br>
+        <div class="aircraft-banner">
+          <div class="aircraft-icon">
+            <img src="https://sfo3.digitaloceanspaces.com/sae-assets/sae-bo-system/system-settings/1747711288216_logo.png" alt="Aircraft Icon" class="aircraft-image">
+          </div>
+        </div>
         <h1>Calculadora de Costos de Aeronave</h1>
 
-        <h2>
+        <!-- <h2>
           Indicadores
-        </h2>
+        </h2> -->
 
         <!-- Indicadores de Costos -->
         <div class="cost-indicators">
@@ -64,11 +69,11 @@
               <div class="hours-details">
                 <div class="hours-row">
                   <span>Horas Nacionales / Año:</span>
-                  <span>{{ formData.hrs_vuelo_nacionales_anual }}</span>
+                  <span>{{ horasConfig.porcentaje_hrs_nacionales }}%</span>
                 </div>
                 <div class="hours-row">
                   <span>Horas Internacionales / Año:</span>
-                  <span>{{ formData.hrs_vuelo_extranjero_anual }}</span>
+                  <span>{{ horasConfig.porcentaje_hrs_extranjero }}%</span>
                 </div>
                 <div class="hours-total">
                   <span>Total Horas ({{ formData.anos_inversion }} años):</span>
@@ -163,10 +168,10 @@
 
               <div class="breakdown-total">
                 <div class="total-content">
-                  <div class="total-label">Costo Total por Hora</div>
-                  <div class="total-period">Sin inflación</div>
-                  <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_por_hora) }}</div>
-                  <div class="total-per-hour">por hora de vuelo</div>
+                  <div class="total-label">Costo Total Anual</div>
+                  <div class="total-period"></div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_anual) }}</div>
+                  <div class="total-per-hour">Sin inflación</div>
                 </div>
               </div>
             </div>
@@ -230,10 +235,8 @@
 
               <div class="breakdown-total">
                 <div class="total-content">
-                  <div class="total-label">Reserva Mtto Total</div>
-                  <div class="total-period">Anual</div>
-                  <div class="total-amount">USD {{ formatCurrencyText(calc_reserva_mtto_total_anual) }}</div>
-                  <div class="total-per-hour">USD {{ formatCurrencyText(calc_costo_mantenimiento_hr) }}/hora</div>
+                  <div class="total-label">Inversión proyectada a ({{ formData.anos_inversion }} años)</div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_inversion_final) }}</div>
                 </div>
               </div>
 
@@ -241,10 +244,8 @@
 
               <div class="breakdown-total-grand">
                 <div class="total-content">
-                  <div class="total-label">Costo Total Anual ({{ formData.anos_inversion }} años)</div>
-                  <div class="total-period">Para {{ (formData.hrs_vuelo_nacionales_anual + formData.hrs_vuelo_extranjero_anual) * formData.anos_inversion }} horas</div>
-                  <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_anual * formData.anos_inversion) }}</div>
-                  <div class="total-per-hour">USD {{ formatCurrencyText(calc_total_costo_por_hora) }}/hora</div>
+                  <div class="total-label">Posible Beneficio Fiscal ({{ formData.anos_inversion }} años)</div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_beneficio_fiscal) }}</div>
                 </div>
               </div>
             </div>

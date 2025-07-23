@@ -5,7 +5,7 @@ $accent-color: #28a745;
 $text-dark: #333;
 $text-light: #555;
 $text-muted: #7E8183;
-$background-light: #f5f5f5;
+$background-light: #fff;
 $white: #FFFFFF;
 $shadow-subtle: 0 2px 12px rgba(0, 0, 0, 0.04);
 $radius: 12px;
@@ -14,6 +14,19 @@ $radius: 12px;
   min-height: 100vh;
   background: $background-light;
   padding: 2rem 0;
+
+  .aircraft-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+    
+    img {
+      width: 100%;
+      max-width: 20rem;
+      object-fit: cover;
+    }
+  }
 
   .form-container {
     max-width: 1000px;

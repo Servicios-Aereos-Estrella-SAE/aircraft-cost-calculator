@@ -4,6 +4,7 @@ import jsonParams from './src/params.json'
 export default defineComponent({
   name: 'calculadora',
   setup() {
+    
     const params = jsonParams
     const factorS600HrsMttoDiscrepancias = 80000 / 600
     const factorS600HrsMttoInteriores = 20000 / 600
