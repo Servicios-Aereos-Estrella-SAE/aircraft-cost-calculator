@@ -1,6 +1,18 @@
+// Variables de color para consistencia
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$accent-color: #28a745;
+$text-dark: #333;
+$text-light: #555;
+$text-muted: #7E8183;
+$background-light: #f5f5f5;
+$white: #FFFFFF;
+$shadow-subtle: 0 2px 12px rgba(0, 0, 0, 0.04);
+$radius: 12px;
+
 .configuration-forms {
   min-height: 100vh;
-  background: #f5f5f5;
+  background: $background-light;
   padding: 2rem 0;
 
   .form-container {
@@ -9,20 +21,28 @@
     padding: 0 1rem;
 
     .btn {
-      padding: 0.5rem 1rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      border: 1.5px solid rgba(0, 0, 0, 0.08);
+      border-radius: $radius;
       background: white;
-      color: #333;
+      color: $text-dark;
       text-decoration: none;
       display: inline-block;
       margin-bottom: 1rem;
       font-size: 0.9rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: all 0.3s ease;
+      box-shadow: $shadow-subtle;
 
       &:hover {
-        background: #f0f0f0;
+        background: #f8f9fa;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      &:active {
+        transform: translateY(0);
       }
 
       i {
@@ -40,9 +60,9 @@
 
     .params-form {
       background: white;
-      border-radius: 8px;
+      border-radius: $radius;
       padding: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: $shadow-subtle;
 
       .form-section {
         margin-bottom: 2rem;
@@ -68,14 +88,15 @@
           grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
           gap: 1rem;
 
-          .form-group {
+          .input-group {
             display: flex;
             flex-direction: column;
+            margin-bottom: 1.5rem;
 
             label {
               font-weight: 500;
               color: #555;
-              margin-bottom: 0.5rem;
+              margin-bottom: 0.75rem;
               font-size: 0.9rem;
             }
 
@@ -91,26 +112,160 @@
               }
             }
 
-            input {
-              padding: 0.5rem;
-              border: 1px solid #ddd;
-              border-radius: 4px;
-              font-size: 0.9rem;
-              transition: border-color 0.2s ease;
-
+            .form-input {
+              width: 100%;
+              padding: 0.875rem 1rem;
+              border: 1.5px solid rgba(0, 0, 0, 0.06);
+              border-radius: 12px;
+              font-size: 0.95rem;
+              font-weight: 300;
+              transition: all 0.3s ease;
+              background: white;
+              color: #333;
+              box-sizing: border-box;
+              min-height: 48px;
+              line-height: 1.2;
+              
               &:focus {
                 outline: none;
                 border-color: #007bff;
+                box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+              }
+              
+              &:hover:not(:focus) {
+                border-color: rgba(0, 0, 0, 0.12);
               }
 
               &[type="number"] {
+                -webkit-appearance: none;
                 -moz-appearance: textfield;
+                appearance: none;
                 
                 &::-webkit-outer-spin-button,
                 &::-webkit-inner-spin-button {
                   -webkit-appearance: none;
                   margin: 0;
                 }
+              }
+            }
+
+            .input-wrapper {
+              position: relative;
+              width: 100%;
+              display: block;
+              
+              .currency, .icon {
+                position: absolute;
+                left: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #7F8C8D;
+                font-weight: 400;
+                z-index: 2;
+                pointer-events: none;
+                font-size: 0.95rem;
+              }
+              
+              .currency + .form-input,
+              .icon + .form-input {
+                padding-left: 2.8rem;
+              }
+              
+              .form-input {
+                width: 100%;
+                display: block;
+              }
+              
+              // Money input with segmented design
+              &.money-input {
+                display: flex;
+                border: 1px solid rgba(0, 0, 0, 0.08);
+                border-radius: 12px;
+                overflow: hidden;
+                background: white;
+                transition: all 0.2s ease;
+                
+                &:focus-within {
+                  border-color: #007bff;
+                  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+                }
+                
+                &:hover:not(:focus-within) {
+                  border-color: rgba(0, 0, 0, 0.12);
+                }
+                
+                .input-prefix {
+                  background: #f8f9fa;
+                  padding: 0.875rem 1rem;
+                  border-right: 1px solid rgba(0, 0, 0, 0.08);
+                  color: #7F8C8D;
+                  font-weight: 500;
+                  font-size: 0.95rem;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  min-width: 3rem;
+                  flex-shrink: 0;
+                }
+                
+                .form-input {
+                  border: none;
+                  padding: 0.875rem 1rem;
+                  background: transparent;
+                  flex: 1;
+                  font-size: 0.95rem;
+                  color: #333;
+                  
+                  &:focus {
+                    outline: none;
+                    box-shadow: none;
+                  }
+                  
+                  &::placeholder {
+                    color: #7E8183;
+                  }
+                }
+                
+                .input-suffix {
+                  background: #f8f9fa;
+                  padding: 0.875rem 1rem;
+                  border-left: 1px solid rgba(0, 0, 0, 0.08);
+                  color: #7F8C8D;
+                  font-weight: 500;
+                  font-size: 0.85rem;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  min-width: 3.5rem;
+                  flex-shrink: 0;
+                }
+              }
+            }
+
+            .input-hint {
+              color: #7E8183;
+              font-size: 0.85rem;
+              margin-top: 0.5rem;
+              font-weight: 300;
+            }
+
+            .period-badge {
+              display: inline-block;
+              padding: 0.25rem 0.75rem;
+              border-radius: 20px;
+              font-size: 0.75rem;
+              font-weight: 400;
+              margin-top: 0.5rem;
+              letter-spacing: 0.02em;
+              
+              &.monthly {
+                background: rgba(255, 230, 109, 0.2);
+                color: #D68910;
+              }
+              
+              &.annual {
+                background: rgba(78, 205, 196, 0.2);
+                color: #148F77;
               }
             }
           }
@@ -127,35 +282,40 @@
 
         .btn {
           padding: 0.75rem 1.5rem;
-          border: 1px solid #ddd;
-          border-radius: 4px;
+          border: 1.5px solid rgba(0, 0, 0, 0.08);
+          border-radius: $radius;
           font-size: 0.9rem;
           font-weight: 500;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
           text-decoration: none;
           display: inline-block;
+          box-shadow: $shadow-subtle;
 
           &:hover {
-            transform: none;
-            box-shadow: none;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+          }
+
+          &:active {
+            transform: translateY(0);
           }
 
           &.btn-primary {
-            background: #007bff;
+            background: $primary-color;
             color: white;
-            border-color: #007bff;
+            border-color: $primary-color;
 
             &:hover {
-              background: #0056b3;
-              border-color: #0056b3;
+              background: darken($primary-color, 10%);
+              border-color: darken($primary-color, 10%);
             }
           }
 
           &.btn-secondary {
             background: white;
-            color: #6c757d;
-            border-color: #6c757d;
+            color: $secondary-color;
+            border-color: $secondary-color;
 
             &:hover {
               background: #f8f9fa;
@@ -167,7 +327,7 @@
       // Summary styles
       .summary {
         background: #f8f9fa;
-        border-radius: 8px;
+        border-radius: $radius;
         padding: 1.5rem;
         margin-bottom: 2rem;
         border: 1px solid #e9ecef;
@@ -317,11 +477,11 @@
       // Table styles
       .table-container {
         background: white;
-        border-radius: 8px;
+        border-radius: $radius;
         border: 1px solid #dee2e6;
         overflow: hidden;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: $shadow-subtle;
 
         .cost-table {
           width: 100%;

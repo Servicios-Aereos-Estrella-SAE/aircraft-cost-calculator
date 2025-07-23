@@ -17,6 +17,10 @@
         </div>
       </div>
 
+      <h2>
+        Indicadores
+      </h2>
+
       <!-- Indicadores de Costos -->
       <div class="cost-indicators" :class="{ 'updating': isUpdating }">
 
@@ -281,6 +285,10 @@
         </button>
         <small class="download-hint">Genera una imagen con todos los indicadores y desgloses</small>
       </div>
+
+      <h3>
+        Formualrios
+      </h3>
 
       <div class="forms-grid">
         <!-- Formulario 1: Parámetros Básicos -->
