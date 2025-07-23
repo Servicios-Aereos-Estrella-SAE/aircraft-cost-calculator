@@ -125,22 +125,6 @@
             </div>
           </div>
 
-          <!-- Programa de Motores -->
-          <div class="form-section">
-            <h2>Programa de Motores</h2>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="programa_motores_minimo_anual">Programa Motores Mínimo Anual (Hrs)</label>
-                <input 
-                  id="programa_motores_minimo_anual"
-                  type="number" 
-                  v-model.number="formData.programa_motores_minimo_anual"
-                  @input="updateParam('programa_motores_minimo_anual', $event.target.value)"
-                />
-              </div>
-            </div>
-          </div>
-
           <!-- Mantenimiento -->
           <div class="form-section">
             <h2>Mantenimiento</h2>
@@ -315,9 +299,7 @@
             <div class="item">
               <div class="item-label">Costo Arrendamiento por hora</div>
               <div class="item-value">
-                ${{ formatCurrencyText(
-                  formData.arrendamiento_anual / (parseFloat(formData.hrs_vuelo_nacionales_anual) + parseFloat(formData.hrs_vuelo_extranjero_anual))
-                ) }}
+                ${{ formatCurrencyText(calc_costo_arrendamiento_hr) }}
               </div>
             </div>
             <div class="item">
@@ -329,25 +311,19 @@
             <div class="item">
               <div class="item-label">Costo Guardia Hangar por hora</div>
               <div class="item-value">
-                ${{ formatCurrencyText(
-                  formData.guardia_hangar_anual / (parseFloat(formData.hrs_vuelo_nacionales_anual) + parseFloat(formData.hrs_vuelo_extranjero_anual))
-                ) }}
+                ${{ formatCurrencyText(calc_costo_guardia_hangar_hr) }}
               </div>
             </div>
             <div class="item">
               <div class="item-label">Costo de mantenimiento total por hora</div>
               <div class="item-value">
-                ${{ formatCurrencyText(
-                  calc_reserva_mtto_total_anual / (parseFloat(formData.hrs_vuelo_nacionales_anual) + parseFloat(formData.hrs_vuelo_extranjero_anual))
-                ) }}
+                ${{ formatCurrencyText(calc_costo_mantenimiento_hr) }}
               </div>
             </div>
             <div class="item">
               <div class="item-label">Costo Seguro Aeronave por hora</div>
               <div class="item-value">
-                ${{ formatCurrencyText(
-                  formData.seguro_aeronave_anual / (parseFloat(formData.hrs_vuelo_nacionales_anual) + parseFloat(formData.hrs_vuelo_extranjero_anual))
-                ) }}
+                ${{ formatCurrencyText(calc_costo_seguro_hr) }}
               </div>
             </div>
             <div class="item">

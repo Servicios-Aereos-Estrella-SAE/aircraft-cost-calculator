@@ -59,6 +59,7 @@ export default defineComponent({
     const calc_costo_administrativo_hr = computed(() => {
       const costoAdministrativo = formData.administracion_anual + formData.reserva_capacitacion_pilotos_anual + formData.sueldo_piloto_pic_anual + formData.sueldo_piloto_sic_anual
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
       return (costoAdministrativo * formData.anos_inversion) / (totalHrs * formData.anos_inversion)
     })
 
@@ -176,6 +177,7 @@ export default defineComponent({
 
     const calc_total_costo_anual = computed(() => {
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
       return calc_total_costo_por_hora.value * totalHrs
     })
 
@@ -187,12 +189,15 @@ export default defineComponent({
       const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
       const hrs_vuelo_total_anual = hrs_vuelo_nacionales_anual + hrs_vuelo_extranjero_anual
 
+      if (hrs_vuelo_total_anual === 0) return 0
       return costo_programa_motor_anual / hrs_vuelo_total_anual
     })
 
     // Computed property for total cost per hour (sum of all costs)
     const calc_total_costo_por_hora = computed(() => {
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      
+      if (totalHrs === 0) return 0
       
       // Individual costs per hour
       const costoArrendamientoHr = formData.arrendamiento_anual / totalHrs
@@ -228,12 +233,14 @@ export default defineComponent({
     const calc_fuel_mxn_costo_hr = computed(() => {
       const fuel_mxn_costo_anual = calc_fuel_mxn_costo_anual.value
       const hrs_vuelo_nacionales_anual = parseFloat(formData.hrs_vuelo_nacionales_anual.toString())
+      if (hrs_vuelo_nacionales_anual === 0) return 0
       return fuel_mxn_costo_anual / hrs_vuelo_nacionales_anual
     })
 
     const calc_fuel_usd_costo_hr = computed(() => {
       const fuel_usd_costo_anual = calc_fuel_usd_costo_anual.value
       const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (hrs_vuelo_extranjero_anual === 0) return 0
       return fuel_usd_costo_anual / hrs_vuelo_extranjero_anual
     })
 
@@ -287,7 +294,7 @@ export default defineComponent({
       // Update the actual numeric value in formData
       const formDataKey = key as keyof typeof formData
       if (formDataKey in formData) {
-        formData[formDataKey] = numericValue
+        (formData as any)[formDataKey] = numericValue
       }
     }
 
@@ -357,6 +364,31 @@ export default defineComponent({
       return final
     })
 
+    // Computed properties for inline calculations to avoid division by zero
+    const calc_costo_arrendamiento_hr = computed(() => {
+      const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
+      return formData.arrendamiento_anual / totalHrs
+    })
+
+    const calc_costo_guardia_hangar_hr = computed(() => {
+      const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
+      return formData.guardia_hangar_anual / totalHrs
+    })
+
+    const calc_costo_mantenimiento_hr = computed(() => {
+      const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
+      return calc_reserva_mtto_total_anual.value / totalHrs
+    })
+
+    const calc_costo_seguro_hr = computed(() => {
+      const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (totalHrs === 0) return 0
+      return formData.seguro_aeronave_anual / totalHrs
+    })
+
     return {
       formData,
       formattedData,
@@ -386,7 +418,11 @@ export default defineComponent({
       calc_resale_value,
       calc_inversion_total,
       calc_ingresos_renta_anual,
-      calc_inversion_final
+      calc_inversion_final,
+      calc_costo_arrendamiento_hr,
+      calc_costo_guardia_hangar_hr,
+      calc_costo_mantenimiento_hr,
+      calc_costo_seguro_hr
     }
   },
 })
