@@ -56,6 +56,43 @@ export default defineComponent({
       precio_venta_aeronave: params.precio_venta_aeronave
     })
 
+    const paqueteHrsVuelo = computed(() => {
+      const hrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      if (hrs === 0) return []
+
+      const costoHr = 3500
+      const years = formData.anos_inversion
+      const costoTotalAnual = costoHr * hrs
+      const inflationRate = formData.tasa_inflacion_anual / 100
+      const yearlyCosts = []
+
+      for (let year = 1; year <= years; year++) {
+        let costWithInflation: number
+        
+        if (year === 1) {
+          // Primer año: sin inflación
+          costWithInflation = costoTotalAnual
+        } else {
+          // Años subsecuentes: aplicar inflación
+          costWithInflation = costoTotalAnual * Math.pow(1 + inflationRate, year - 1)
+        }
+
+        yearlyCosts.push({
+          anio: year,
+          costo: costWithInflation,
+          costoFormateado: formatCurrencyText(costWithInflation),
+          incremento: year === 1 ? 0 : costWithInflation - costoTotalAnual,
+          incrementoFormateado: year === 1 ? '$0.00' : formatCurrencyText(costWithInflation - costoTotalAnual)
+        })
+      }
+
+      return yearlyCosts
+    })
+
+    const paqueteHrsVueloTotal = computed(() => {
+      return paqueteHrsVuelo.value.reduce((acc: number, curr: any) => acc + curr.costo, 0)
+    })
+
     const calc_costo_administrativo_hr = computed(() => {
       const costoAdministrativo = formData.administracion_anual + formData.reserva_capacitacion_pilotos_anual + formData.sueldo_piloto_pic_anual + formData.sueldo_piloto_sic_anual
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
@@ -219,29 +256,47 @@ export default defineComponent({
       const turbocina_mex_lt_hora = parseFloat(formData.turbocina_mex_lt_hora.toString())
       const costo_turbocina_mex_lt = parseFloat(formData.costo_turbocina_mex_lt.toString())
       const hrs_vuelo_nacionales_anual = parseFloat(formData.hrs_vuelo_nacionales_anual.toString())
+      const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      const hrs_vuelo_total_anual = hrs_vuelo_nacionales_anual + hrs_vuelo_extranjero_anual
       const costo = (turbocina_mex_lt_hora * hrs_vuelo_nacionales_anual) * costo_turbocina_mex_lt
-      return costo / formData.tasa_cambio_usd_mxn
+      // const costo = (turbocina_mex_lt_hora * hrs_vuelo_total_anual) * costo_turbocina_mex_lt
+      const costoAnual = costo / formData.tasa_cambio_usd_mxn
+      return costoAnual
     })
 
     const calc_fuel_usd_costo_anual = computed(() => {
       const turbocina_usa_gal_hora = parseFloat(formData.turbocina_usa_gal_hora.toString())
       const costo_turbocina_usa_gal = parseFloat(formData.costo_turbocina_usa_gal.toString())
       const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
-      return (turbocina_usa_gal_hora * hrs_vuelo_extranjero_anual) * costo_turbocina_usa_gal
+      const hrs_vuelo_nacionales_anual = parseFloat(formData.hrs_vuelo_nacionales_anual.toString())
+      const hrs_vuelo_total_anual = hrs_vuelo_nacionales_anual + hrs_vuelo_extranjero_anual
+      // return (turbocina_usa_gal_hora * hrs_vuelo_total_anual) * costo_turbocina_usa_gal
+      const costoAnual = (turbocina_usa_gal_hora * hrs_vuelo_extranjero_anual) * costo_turbocina_usa_gal
+      return costoAnual
     })
 
     const calc_fuel_mxn_costo_hr = computed(() => {
       const fuel_mxn_costo_anual = calc_fuel_mxn_costo_anual.value
+      const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
       const hrs_vuelo_nacionales_anual = parseFloat(formData.hrs_vuelo_nacionales_anual.toString())
+      const hrs_vuelo_total_anual = hrs_vuelo_nacionales_anual + hrs_vuelo_extranjero_anual
+      
       if (hrs_vuelo_nacionales_anual === 0) return 0
-      return fuel_mxn_costo_anual / hrs_vuelo_nacionales_anual
+
+      const costoHr = fuel_mxn_costo_anual / hrs_vuelo_total_anual
+      return costoHr
     })
 
     const calc_fuel_usd_costo_hr = computed(() => {
       const fuel_usd_costo_anual = calc_fuel_usd_costo_anual.value
       const hrs_vuelo_extranjero_anual = parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
+      const hrs_vuelo_nacionales_anual = parseFloat(formData.hrs_vuelo_nacionales_anual.toString())
+      const hrs_vuelo_total_anual = hrs_vuelo_nacionales_anual + hrs_vuelo_extranjero_anual
+
       if (hrs_vuelo_extranjero_anual === 0) return 0
-      return fuel_usd_costo_anual / hrs_vuelo_extranjero_anual
+
+      const costoHr = fuel_usd_costo_anual / hrs_vuelo_total_anual
+      return costoHr
     })
 
     // Computed formatted value for maintenance cost with inflation
@@ -389,6 +444,10 @@ export default defineComponent({
       return formData.seguro_aeronave_anual / totalHrs
     })
 
+    const calc_diferencia_paquete_hrs_inversion = computed(() => {
+      return paqueteHrsVueloTotal.value - calc_inversion_final.value
+    })
+
     return {
       formData,
       formattedData,
@@ -422,7 +481,10 @@ export default defineComponent({
       calc_costo_arrendamiento_hr,
       calc_costo_guardia_hangar_hr,
       calc_costo_mantenimiento_hr,
-      calc_costo_seguro_hr
+      calc_costo_seguro_hr,
+      paqueteHrsVuelo,
+      paqueteHrsVueloTotal,
+      calc_diferencia_paquete_hrs_inversion
     }
   },
 })

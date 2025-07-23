@@ -425,12 +425,86 @@
             </div>
           </div>
 
+          <h3>
+            Paquete de Hrs de Vuelo
+          </h3>
+
+          <div class="table-container">
+            <table class="cost-table">
+              <thead>
+                <tr>
+                  <th>Año</th>
+                  <th>Costo Paquete de Horas</th>
+                  <th>Incremento por Inflación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="costo in paqueteHrsVuelo" :key="costo.anio">
+                  <td>{{ costo.anio }}</td>
+                  <td>${{ costo.costoFormateado }}</td>
+                  <td>{{ costo.incrementoFormateado }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="summary">
+            <div class="item total-item">
+              <div class="item-label">
+                Costo total del paquete de horas de vuelo
+              </div>
+              <div class="item-value">
+                ${{ formatCurrencyText(paqueteHrsVueloTotal) }}
+              </div>
+            </div>
+                         <div class="item total-item" 
+                  :class="{
+                    'negative-value': calc_diferencia_paquete_hrs_inversion < 0,
+                    'positive-value': calc_diferencia_paquete_hrs_inversion > 0
+                  }">
+               <div class="item-label">
+                 Diferencia entre paquete de horas e inversión
+               </div>
+               <div class="item-value">
+                 ${{ formatCurrencyText(calc_diferencia_paquete_hrs_inversion) }}
+               </div>
+             </div>
+          </div>
+
           <!-- Botones de Acción -->
           <div class="form-actions">
             <button type="button" @click="resetToDefaults" class="btn btn-secondary">
               Restablecer Valores
             </button>
           </div>
+
+          <h3>
+            Dudas
+          </h3>
+
+          <ul>
+            <li>
+              ¿Porque el costo por hr en combustible se divide entre el total de horas y no por las horas de vuelo nacionales o internacionales segun corresponda?
+            </li>
+            <br>
+            <li>
+              En los formatos el mantenimiento se incrementa en 8% anual, es necesario hacerlo asi, ya que al final los valores costo anual tambien se les aplica un 5% de inflacion. (actualmente no se aplica la inflación al mantenimiento)
+            </li>
+            <br>
+            <li>
+              La inflación siempre debe ser igual ya que hay 5% y 8% de inflación en los formatos.
+            </li>
+            <br>
+            <li>
+              ¿Cuales serian los campos que no se pueden modificar en formulario?
+            </li>
+            <br>
+            <li>
+              Pendiente: Hacer que ciertos valores sean opcionales en los calculos. (capacitacion , administracion , Hangar)
+              <br>
+              Desglozar los costos de capacitacion para poder omitir algunos?
+            </li>
+          </ul>
         </form>
       </div>
     </div>
