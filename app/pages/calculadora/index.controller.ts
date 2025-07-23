@@ -445,10 +445,9 @@ export default defineComponent({
       const purchasePrice = formData.precio_venta_aeronave
       const depreciationRate = formData.tasa_depreciacion_anual
       const ownershipYears = formData.anos_inversion
-      const resaleValue = purchasePrice * Math.pow(1 - depreciationRate / 100, ownershipYears)
-      const calc_resale_value = resaleValue
+      const resaleValue = calculateResaleValue(purchasePrice, depreciationRate, ownershipYears)
 
-      const final = calc_inversion_total - calc_ingresos_renta_anual - calc_resale_value
+      const final = calc_inversion_total - calc_ingresos_renta_anual - resaleValue
       return final
     })
 

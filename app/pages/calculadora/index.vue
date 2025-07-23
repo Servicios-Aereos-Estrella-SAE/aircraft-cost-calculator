@@ -11,6 +11,250 @@
         <br>
         <h1>Calculadora de Costos de Aeronave</h1>
 
+        <h2>
+          Indicadores
+        </h2>
+
+        <!-- Indicadores de Costos -->
+        <div class="cost-indicators">
+
+          <div class="indicator-card purchase-price">
+            <div class="indicator-content">
+              <div class="indicator-label">Precio de Venta de Aeronave</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(formData.precio_venta_aeronave) }}</div>
+              <div class="indicator-subtitle">Inversión inicial</div>
+            </div>
+          </div>
+
+          <div class="indicator-card resale-value">
+            <div class="indicator-content">
+              <div class="indicator-label">Valor de Reventa</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_resale_value) }}</div>
+              <div class="indicator-subtitle">Valor estimado al final</div>
+            </div>
+          </div>
+
+          <div class="indicator-card cost-per-hour-final">
+            <div class="indicator-content">
+              <div class="indicator-label">Costo por Hora Total</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_total_costo_por_hora) }}</div>
+              <div class="indicator-subtitle">Precio final de operación</div>
+            </div>
+          </div>
+          
+          <div class="indicator-card fixed-costs-per-hour">
+            <div class="indicator-content">
+              <div class="indicator-label">Costos Fijos por Hora</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_costo_arrendamiento_hr + calc_costo_administrativo_hr + calc_costo_guardia_hangar_hr + calc_costo_seguro_hr) }}</div>
+              <div class="indicator-subtitle">Por hora de vuelo</div>
+            </div>
+          </div>
+          
+          <div class="indicator-card variable-costs-per-hour">
+            <div class="indicator-content">
+              <div class="indicator-label">Costos Variables por Hora</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_fuel_mxn_costo_hr + calc_fuel_usd_costo_hr + calc_costo_mantenimiento_hr + calc_programa_motor_anual) }}</div>
+              <div class="indicator-subtitle">Por hora de vuelo</div>
+            </div>
+          </div>
+
+          <div class="indicator-card hours-summary">
+            <div class="indicator-content">
+              <div class="indicator-label">Resumen de Horas de Vuelo</div>
+              <div class="hours-details">
+                <div class="hours-row">
+                  <span>Horas Nacionales / Año:</span>
+                  <span>{{ formData.hrs_vuelo_nacionales_anual }}</span>
+                </div>
+                <div class="hours-row">
+                  <span>Horas Internacionales / Año:</span>
+                  <span>{{ formData.hrs_vuelo_extranjero_anual }}</span>
+                </div>
+                <div class="hours-total">
+                  <span>Total Horas ({{ formData.anos_inversion }} años):</span>
+                  <span>{{ (formData.hrs_vuelo_nacionales_anual + formData.hrs_vuelo_extranjero_anual) * formData.anos_inversion }} horas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Desglose Detallado -->
+        <div class="detailed-breakdown">
+          <!-- Desglose Costos por Hora -->
+          <div class="breakdown-card">
+            <div class="breakdown-header">
+              <h3>Costos por Hora de Vuelo</h3>
+            </div>
+            <div class="breakdown-content">
+              <div class="breakdown-items-wrapper">
+                <div class="breakdown-item">
+                  <div class="item-icon">📋</div>
+                  <div class="item-details">
+                    <div class="item-name">Costo Administrativo</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_costo_administrativo_hr) }}</div>
+                    <div class="item-annual">Incluye administración, capacitación y sueldos</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">🏠</div>
+                  <div class="item-details">
+                    <div class="item-name">Costo Guardia Hangar</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_costo_guardia_hangar_hr) }}</div>
+                    <div class="item-annual">por hora</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">🔧</div>
+                  <div class="item-details">
+                    <div class="item-name">Costo Mantenimiento Total</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_costo_mantenimiento_hr) }}</div>
+                    <div class="item-annual">por hora</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">⛽</div>
+                  <div class="item-details">
+                    <div class="item-name">Combustible Nacional</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_fuel_mxn_costo_hr) }}</div>
+                    <div class="item-annual">por hora</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">🌍</div>
+                  <div class="item-details">
+                    <div class="item-name">Combustible Extranjero</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_fuel_usd_costo_hr) }}</div>
+                    <div class="item-annual">por hora</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">⚙️</div>
+                  <div class="item-details">
+                    <div class="item-name">Programa Motores</div>
+                    <div class="item-period">por hora</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_programa_motor_anual) }}</div>
+                    <div class="item-annual">por hora</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="breakdown-total">
+                <div class="total-content">
+                  <div class="total-label">Costo Total por Hora</div>
+                  <div class="total-period">Sin inflación</div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_por_hora) }}</div>
+                  <div class="total-per-hour">por hora de vuelo</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desglose Reservas de Mantenimiento -->
+          <div class="breakdown-card">
+            <div class="breakdown-header">
+              <h3>Reservas de Mantenimiento</h3>
+            </div>
+            <div class="breakdown-content">
+              <div class="breakdown-items-wrapper">
+                <div class="breakdown-item">
+                  <div class="item-icon">🔧</div>
+                  <div class="item-details">
+                    <div class="item-name">Reserva Mtto Programado</div>
+                    <div class="item-period">anual</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(formData.reserva_mtto_programado_anual) }}</div>
+                    <div class="item-annual">anual</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">⚠️</div>
+                  <div class="item-details">
+                    <div class="item-name">Reserva Mtto Discrepancias</div>
+                    <div class="item-period">anual</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_reserva_mtto_discrepancias_anual) }}</div>
+                    <div class="item-annual">anual</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">🪑</div>
+                  <div class="item-details">
+                    <div class="item-name">Reserva Mtto Interiores</div>
+                    <div class="item-period">anual</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(calc_reserva_mtto_interiores_anual) }}</div>
+                    <div class="item-annual">anual</div>
+                  </div>
+                </div>
+
+                <div class="breakdown-item">
+                  <div class="item-icon">💰</div>
+                  <div class="item-details">
+                    <div class="item-name">Costo Mtto con Inflación</div>
+                    <div class="item-period">total</div>
+                  </div>
+                  <div class="item-values">
+                    <div class="item-cost">USD {{ formatCurrencyText(formattedCostoMttoInflacion) }}</div>
+                    <div class="item-annual">con inflación USA</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="breakdown-total">
+                <div class="total-content">
+                  <div class="total-label">Reserva Mtto Total</div>
+                  <div class="total-period">Anual</div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_reserva_mtto_total_anual) }}</div>
+                  <div class="total-per-hour">USD {{ formatCurrencyText(calc_costo_mantenimiento_hr) }}/hora</div>
+                </div>
+              </div>
+
+              <div class="breakdown-divider"></div>
+
+              <div class="breakdown-total-grand">
+                <div class="total-content">
+                  <div class="total-label">Costo Total Anual ({{ formData.anos_inversion }} años)</div>
+                  <div class="total-period">Para {{ (formData.hrs_vuelo_nacionales_anual + formData.hrs_vuelo_extranjero_anual) * formData.anos_inversion }} horas</div>
+                  <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_anual * formData.anos_inversion) }}</div>
+                  <div class="total-per-hour">USD {{ formatCurrencyText(calc_total_costo_por_hora) }}/hora</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h2>
+          Configuración
+        </h2>
+
         <form @submit.prevent="handleSubmit" class="params-form">
           <!-- Años de Inversión -->
           <div class="form-section">
@@ -25,7 +269,7 @@
           </div>
 
           <!-- Tasas y Cambios -->
-          <div class="form-section">
+          <div class="form-section" hidden>
             <h2>Tasas y Cambios</h2>
             <div class="form-grid">
               <div class="input-group">
@@ -90,7 +334,7 @@
           </div>
 
           <!-- Costos de Turbosina -->
-          <div class="form-section">
+          <div class="form-section" hidden>
             <h2>Costos de Turbosina</h2>
             <div class="form-grid">
               <div class="input-group">
@@ -133,7 +377,7 @@
           </div>
 
           <!-- Mantenimiento -->
-          <div class="form-section">
+          <div class="form-section" hidden>
             <h2>Mantenimiento</h2>
             <div class="form-grid">
               <div class="input-group">
@@ -181,7 +425,7 @@
           </div>
 
           <!-- Sueldos -->
-          <div class="form-section">
+          <div class="form-section" hidden>
             <h2>Sueldos</h2>
             <div class="form-grid">
               <div class="input-group">
@@ -221,7 +465,7 @@
                 </div>
                 <small class="period-badge annual">anual</small>
               </div>
-              <div class="input-group">
+              <div class="input-group" style="display: none;">
                 <label for="seguro_aeronave_anual">Seguro Aeronave Anual</label>
                 <div class="input-wrapper money-input">
                   <div class="input-prefix">$</div>
@@ -231,7 +475,7 @@
                 </div>
                 <small class="period-badge annual">anual</small>
               </div>
-              <div class="input-group">
+              <div class="input-group" style="display: none;">
                 <label for="arrendamiento_anual">Arrendamiento Anual</label>
                 <div class="input-wrapper money-input">
                   <div class="input-prefix">$</div>
