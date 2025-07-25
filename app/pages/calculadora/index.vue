@@ -2,23 +2,15 @@
   <NuxtLayout>
     <div class="configuration-forms">
       <div class="form-container">
-        <!-- <NuxtLink to="/">
-          <button class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i>
-            version 1
-          </button>
-        </NuxtLink> -->
+
         <br>
         <div class="aircraft-banner">
           <div class="aircraft-icon">
             <img src="https://sfo3.digitaloceanspaces.com/sae-assets/sae-bo-system/system-settings/1747711288216_logo.png" alt="Aircraft Icon" class="aircraft-image">
           </div>
         </div>
-        <h1>Calculadora de Costos de Aeronave</h1>
 
-        <!-- <h2>
-          Indicadores
-        </h2> -->
+        <h1>Calculadora de Costos de Aeronave</h1>
 
         <!-- Indicadores de Costos -->
         <div class="cost-indicators">
@@ -171,7 +163,7 @@
                   <div class="total-label">Costo Total Anual</div>
                   <div class="total-period"></div>
                   <div class="total-amount">USD {{ formatCurrencyText(calc_total_costo_anual) }}</div>
-                  <div class="total-per-hour">Sin inflación</div>
+                  <div class="total-per-hour">A valor presente</div>
                 </div>
               </div>
             </div>
@@ -252,9 +244,18 @@
           </div>
         </div>
 
-        <h2>
-          Configuración
-        </h2>
+        <!-- Botón para mostrar/ocultar configuración -->
+        <div class="configuration-toggle">
+          <button type="button" @click="toggleConfiguration" class="btn btn-primary toggle-btn">
+            <i :class="showConfiguration ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+            {{ showConfiguration ? 'Ocultar Configuración' : 'Mostrar Configuración' }}
+          </button>
+        </div>
+
+        <div v-show="showConfiguration" class="configuration-section">
+          <h2>
+            Configuración
+          </h2>
 
         <form @submit.prevent="handleSubmit" class="params-form">
           <!-- Años de Inversión -->
@@ -318,9 +319,14 @@
                 <label for="horas_totales">Horas Totales Anuales</label>
                 <div class="input-wrapper">
                   <span class="icon">🕐</span>
-                  <input id="horas_totales" type="number"
-                    v-model.number="horasConfig.horas_totales"
-                    class="form-input" />
+                  <select id="horas_totales" 
+                    :value="horasConfig.horas_totales"
+                    @change="actualizarHorasTotales(Number($event.target.value))"
+                    class="form-input">
+                    <option v-for="horas in horasOpciones" :key="horas" :value="horas">
+                      {{ horas }} horas
+                    </option>
+                  </select>
                 </div>
                 <small class="input-hint">Total de horas de vuelo al año</small>
               </div>
@@ -354,24 +360,7 @@
               </div>
               
               <!-- Campos calculados automáticamente (solo lectura) -->
-              <!-- <div class="input-group" h>
-                <label for="hrs_vuelo_nacionales_anual">Horas de Vuelo Nacionales Anual (Calculado)</label>
-                <div class="input-wrapper">
-                  <span class="icon">✈</span>
-                  <input id="hrs_vuelo_nacionales_anual" type="number"
-                    v-model.number="formData.hrs_vuelo_nacionales_anual"
-                    readonly class="form-input readonly" />
-                </div>
-              </div>
-              <div class="input-group">
-                <label for="hrs_vuelo_extranjero_anual">Horas de Vuelo Extranjero Anual (Calculado)</label>
-                <div class="input-wrapper">
-                  <span class="icon">○</span>
-                  <input id="hrs_vuelo_extranjero_anual" type="number"
-                    v-model.number="formData.hrs_vuelo_extranjero_anual"
-                    readonly class="form-input readonly" />
-                </div>
-              </div> -->
+    
             </div>
           </div>
 
@@ -574,21 +563,18 @@
             <div class="item">
               <div class="item-label">Reserva Mtto Discrepancias Anual</div>
               <div class="item-value">
-                <!-- ${{ formatCurrencyText(formData.reserva_mtto_discrepancias_anual) }} -->
                 ${{ formatCurrencyText(calc_reserva_mtto_discrepancias_anual) }}
               </div>
             </div>
             <div class="item">
               <div class="item-label">Reserva Mtto Interiores Anual</div>
               <div class="item-value">
-                <!-- ${{ formatCurrencyText(formData.reserva_mtto_interiores_anual) }} -->
                 ${{ formatCurrencyText(calc_reserva_mtto_interiores_anual) }}
               </div>
             </div>
             <div class="item">
               <div class="item-label">Reserva Mtto Total Anual</div>
               <div class="item-value">
-                <!-- ${{ formatCurrencyText(formData.reserva_mtto_total_anual) }} -->
                 ${{ formatCurrencyText(calc_reserva_mtto_total_anual) }}
               </div>
             </div>
@@ -655,13 +641,13 @@
 
           <div class="summary">
             <div class="item total-item">
-              <div class="item-label">Costo total por hora (Sin Inflación)</div>
+              <div class="item-label">Costo total por hora (A valor presente)</div>
               <div class="item-value">
                 ${{ formatCurrencyText(calc_total_costo_por_hora) }}
               </div>
             </div>
             <div class="item total-item">
-              <div class="item-label">Costo total anual (Sin Inflación)</div>
+              <div class="item-label">Costo total anual (A valor presente)</div>
               <div class="item-value">
                 ${{ formatCurrencyText(calc_total_costo_anual) }}
               </div>
@@ -715,9 +701,15 @@
               </div>
             </div>
             <div class="item total-item">
-              <div class="item-label">Ingresos por renta en {{ formData.anos_inversion }} años</div>
+              <div class="item-label">Ingresos por arrendamiento de la aeronave en {{ formData.anos_inversion }} años</div>
               <div class="item-value">
                 ${{ formatCurrencyText(calc_ingresos_renta_anual) }}
+              </div>
+            </div>
+            <div class="item total-item">
+              <div class="item-label">Ingreso por renta (SAE) {{ formData.anos_inversion }} años</div>
+              <div class="item-value">
+                 $0.00
               </div>
             </div>
             <div class="item total-item">
@@ -788,6 +780,7 @@
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   </NuxtLayout>
