@@ -62,6 +62,20 @@ export default defineComponent({
     const showConfiguration = ref(false)
 
     /**
+     * Estado reactivo para controlar la inclusión de costos opcionales
+     */
+    const costosOpcionales = reactive({
+      incluir_capacitacion_pilotos: true,
+      incluir_administracion: true,
+      incluir_guardia_hangar: true
+    })
+
+    /**
+     * Estado reactivo para mensajes de validación
+     */
+    const validationMessage = ref('')
+
+    /**
      * Datos del formulario principal con todos los parámetros financieros
      * Incluye tasas, costos, horas de vuelo y configuraciones de inversión
      */
@@ -78,6 +92,10 @@ export default defineComponent({
       // Horas de vuelo (se calcularán automáticamente)
       hrs_vuelo_nacionales_anual: params.hrs_vuelo_nacionales_anual,
       hrs_vuelo_extranjero_anual: params.hrs_vuelo_extranjero_anual,
+      
+      // Horas y precio de renta SAE
+      horas_renta_sae: params.horas_renta_sae,
+      precio_hr_renta: params.precio_hr_renta,
       
       // Costos de turbosina
       costo_turbocina_mex_lt: params.costo_turbocina_mex_lt,
@@ -143,6 +161,7 @@ export default defineComponent({
      * Esta función se ejecuta cuando el usuario cambia la selección de horas de vuelo anuales.
      * Automáticamente actualiza tanto la configuración de horas como el costo de mantenimiento
      * correspondiente, lo que dispara la recalculación de todos los costos dependientes.
+     * También valida y ajusta las Horas Renta SAE si es necesario.
      * 
      * @param {number} horas - Nuevo valor de horas totales anuales seleccionado
      * 
@@ -151,6 +170,28 @@ export default defineComponent({
       horasConfig.horas_totales = horas
       // Actualizar el costo de mantenimiento programado según las horas seleccionadas
       formData.costo_mtto_programado_total_anual = obtenerCostoMttoPorHoras(horas)
+      
+      // Validar y ajustar Horas Renta SAE si es necesario
+      const maxHoras = getMaxHoras()
+      const maxHorasRentaSae = maxHoras - horas
+      
+      if (maxHorasRentaSae <= 0) {
+        if (formData.horas_renta_sae > 0) {
+          validationMessage.value = `Las Horas Renta SAE se han restablecido a 0 porque las horas totales anuales (${horas}) alcanzan o superan el máximo permitido de ${maxHoras} horas.`
+          formData.horas_renta_sae = 0
+          setTimeout(() => {
+            validationMessage.value = ''
+          }, 15000)
+        }
+      } else if (formData.horas_renta_sae > maxHorasRentaSae) {
+        // Ajustar al múltiplo de 100 más cercano que no supere el máximo
+        const adjustedMax = Math.floor(maxHorasRentaSae / 100) * 100
+        validationMessage.value = `Las Horas Renta SAE se han ajustado de ${formData.horas_renta_sae} a ${adjustedMax} (múltiplo de 100 más cercano) para no superar el máximo de ${maxHoras} horas totales.`
+        formData.horas_renta_sae = adjustedMax
+        setTimeout(() => {
+          validationMessage.value = ''
+        }, 15000)
+      }
     }
 
     // Watchers para calcular automáticamente las horas basándose en porcentajes
@@ -205,11 +246,13 @@ export default defineComponent({
 
     /**
      * Calcula el costo administrativo por hora de vuelo
-     * Incluye administración, capacitación de pilotos y sueldos
+     * Incluye administración, capacitación de pilotos y sueldos (según checkboxes habilitados)
      * @returns {number} Costo administrativo por hora
      */
     const calc_costo_administrativo_hr = computed(() => {
-      const costoAdministrativo = formData.administracion_anual + formData.reserva_capacitacion_pilotos_anual + formData.sueldo_piloto_pic_anual + formData.sueldo_piloto_sic_anual
+      const administracion = costosOpcionales.incluir_administracion ? formData.administracion_anual : 0
+      const capacitacion = costosOpcionales.incluir_capacitacion_pilotos ? formData.reserva_capacitacion_pilotos_anual : 0
+      const costoAdministrativo = administracion + capacitacion + formData.sueldo_piloto_pic_anual + formData.sueldo_piloto_sic_anual
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
       if (totalHrs === 0) return 0
       return (costoAdministrativo * formData.anos_inversion) / (totalHrs * formData.anos_inversion)
@@ -351,7 +394,8 @@ export default defineComponent({
       guardia_hangar_anual: params.guardia_hangar_anual.toString(),
       seguro_aeronave_anual: params.seguro_aeronave_anual.toString(),
       arrendamiento_anual: params.arrendamiento_anual.toString(),
-      precio_venta_aeronave: params.precio_venta_aeronave.toString()
+      precio_venta_aeronave: params.precio_venta_aeronave.toString(),
+      precio_hr_renta: params.precio_hr_renta.toString()
     })
 
     /**
@@ -395,7 +439,7 @@ export default defineComponent({
       // Individual costs per hour
       const costoArrendamientoHr = formData.arrendamiento_anual / totalHrs
       const costoAdministrativoHr = calc_costo_administrativo_hr.value
-      const costoGuardiaHangarHr = formData.guardia_hangar_anual / totalHrs
+      const costoGuardiaHangarHr = calc_costo_guardia_hangar_hr.value
       const costoMantenimientoHr = calc_reserva_mtto_total_anual.value / totalHrs
       const costoSeguroHr = formData.seguro_aeronave_anual / totalHrs
       const costoCombustibleNacionalHr = calc_fuel_mxn_costo_hr.value
@@ -486,11 +530,59 @@ export default defineComponent({
     })
 
     /**
+     * Obtiene el valor máximo de horas de vuelo permitidas según mtto_params
+     * @returns {number} Valor máximo de horas
+     */
+    const getMaxHoras = () => {
+      return Math.max(...horasOpciones)
+    }
+
+    /**
      * Actualiza un parámetro numérico en el formulario
      * @param {string} key - Clave del parámetro a actualizar
      * @param {number} value - Nuevo valor numérico
      */
     const updateParam = (key: keyof typeof formData, value: number) => {
+      // Validación especial para horas_renta_sae
+      if (key === 'horas_renta_sae') {
+        const maxHoras = getMaxHoras()
+        const horasTotales = horasConfig.horas_totales
+        const maxHorasRentaSae = maxHoras - horasTotales
+        
+        if (maxHorasRentaSae <= 0) {
+          validationMessage.value = `No se pueden asignar horas de renta SAE. Las horas totales anuales (${horasTotales}) ya alcanzan o superan el máximo permitido de ${maxHoras} horas.`
+          formData[key] = 0
+          setTimeout(() => {
+            validationMessage.value = ''
+          }, 15000)
+          return
+        }
+        
+        // Validar que sea múltiplo de 100
+        if (value > 0 && value % 100 !== 0) {
+          const adjustedValue = Math.floor(value / 100) * 100
+          validationMessage.value = `Las Horas Renta SAE deben ser múltiplo de 100. El valor se ha ajustado de ${value} a ${adjustedValue}.`
+          value = adjustedValue
+          setTimeout(() => {
+            validationMessage.value = ''
+          }, 15000)
+        }
+        
+        if (value > maxHorasRentaSae) {
+          // Ajustar al múltiplo de 100 más cercano que no supere el máximo
+          const adjustedMax = Math.floor(maxHorasRentaSae / 100) * 100
+          validationMessage.value = `El valor máximo para Horas Renta SAE es ${adjustedMax} (múltiplo de 100 más cercano al límite de ${maxHorasRentaSae}). La suma de Horas Totales Anuales (${horasTotales}) + Horas Renta SAE no puede superar ${maxHoras} horas.`
+          formData[key] = adjustedMax
+          setTimeout(() => {
+            validationMessage.value = ''
+          }, 15000)
+          return
+        }
+        
+        // Limpiar mensaje si el valor es válido
+        validationMessage.value = ''
+      }
+      
       formData[key] = value
     }
 
@@ -526,6 +618,10 @@ export default defineComponent({
         }
       })
 
+      // Reset campos específicos que ahora están en params.json
+      formData.horas_renta_sae = params.horas_renta_sae
+      formData.precio_hr_renta = params.precio_hr_renta
+
       // Reset formatted data
       Object.keys(formattedData).forEach(key => {
         const paramKey = key as keyof typeof params
@@ -533,6 +629,9 @@ export default defineComponent({
           (formattedData as any)[key] = formatCurrency(params[paramKey])
         }
       })
+
+      // Reset formatted data específicos que ahora están en params.json
+      formattedData.precio_hr_renta = params.precio_hr_renta.toString()
     }
 
     /**
@@ -610,8 +709,19 @@ export default defineComponent({
     })
 
     /**
+     * Calcula los ingresos totales por renta SAE durante el período de inversión
+     * @returns {number} Ingresos totales por renta SAE
+     */
+    const calc_ingresos_renta_sae = computed(() => {
+      const precio_hr = parseCurrency(formattedData.precio_hr_renta)
+      const horas_anuales = formData.horas_renta_sae || 0
+      const anos = formData.anos_inversion || 0
+      return precio_hr * horas_anuales * anos
+    })
+
+    /**
      * Calcula la inversión final neta
-     * Considera: inversión total - ingresos por arrendamiento - valor de reventa
+     * Considera: inversión total - ingresos por arrendamiento - ingresos por renta SAE - valor de reventa
      * @returns {number} Inversión final neta
      */
     const calc_inversion_final = computed(() => {
@@ -626,7 +736,28 @@ export default defineComponent({
       const ownershipYears = formData.anos_inversion
       const resaleValue = calculateResaleValue(purchasePrice, depreciationRate, ownershipYears)
 
-      const final = calc_inversion_total - calc_ingresos_renta_anual - resaleValue
+      const final = calc_inversion_total - calc_ingresos_renta_anual - calc_ingresos_renta_sae.value - resaleValue
+      return final
+    })
+
+    /**
+     * Calcula la inversión final neta (Contemplando beneficio fiscal)
+     * Considera: inversión total - ingresos por arrendamiento - ingresos por renta SAE - valor de reventa
+     * @returns {number} Inversión final neta
+     */
+    const calc_inversion_final_beneficio_fiscal = computed(() => {
+      const costo_total = totalCostoAnualConInflacionPorAnio.value.reduce((acc: number, curr: any) => acc + curr.costo, 0)
+      const calc_inversion_total = formData.precio_venta_aeronave + costo_total
+
+      const arrendamiento_anual = formData.arrendamiento_anual || 0
+      const calc_ingresos_renta_anual = arrendamiento_anual * formData.anos_inversion
+
+      const purchasePrice = formData.precio_venta_aeronave
+      const depreciationRate = formData.tasa_depreciacion_anual
+      const ownershipYears = formData.anos_inversion
+      const resaleValue = calculateResaleValue(purchasePrice, depreciationRate, ownershipYears)
+
+      const final = calc_inversion_total - calc_ingresos_renta_anual - calc_ingresos_renta_sae.value - resaleValue - calc_beneficio_fiscal.value
       return final
     })
 
@@ -647,7 +778,8 @@ export default defineComponent({
     const calc_costo_guardia_hangar_hr = computed(() => {
       const totalHrs = parseFloat(formData.hrs_vuelo_nacionales_anual.toString()) + parseFloat(formData.hrs_vuelo_extranjero_anual.toString())
       if (totalHrs === 0) return 0
-      return formData.guardia_hangar_anual / totalHrs
+      const guardiaHangar = costosOpcionales.incluir_guardia_hangar ? formData.guardia_hangar_anual : 0
+      return guardiaHangar / totalHrs
     })
 
     /**
@@ -680,6 +812,16 @@ export default defineComponent({
     })
 
     /**
+     * Calcula la diferencia entre el paquete de horas y la inversión final
+     * Indica si la operación es rentable (valor positivo) o no (valor negativo)
+     * Contempla el beneficio fiscal
+     * @returns {number} Diferencia entre ingresos y costos
+     */
+    const calc_diferencia_paquete_hrs_inversion_beneficio_fiscal = computed(() => {
+      return paqueteHrsVueloTotal.value - (calc_inversion_final.value - calc_beneficio_fiscal.value)
+    })
+
+    /**
      * Calcula el beneficio fiscal estimado
      * Considera 30% de beneficio fiscal sobre la aeronave y costos totales
      * @returns {number} Beneficio fiscal total
@@ -698,6 +840,8 @@ export default defineComponent({
       horasConfig,
       horasOpciones,
       showConfiguration,
+      costosOpcionales,
+      validationMessage,
       toggleConfiguration,
       formattedCostoMttoInflacion,
       updateParam,
@@ -719,6 +863,7 @@ export default defineComponent({
       calc_resale_value,
       calc_inversion_total,
       calc_ingresos_renta_anual,
+      calc_ingresos_renta_sae,
       calc_inversion_final,
       calc_costo_arrendamiento_hr,
       calc_costo_guardia_hangar_hr,
@@ -729,7 +874,9 @@ export default defineComponent({
       calc_diferencia_paquete_hrs_inversion,
       calc_beneficio_fiscal,
       actualizarPorcentaje,
-      actualizarHorasTotales
+      actualizarHorasTotales,
+      calc_diferencia_paquete_hrs_inversion_beneficio_fiscal,
+      calc_inversion_final_beneficio_fiscal
     }
   },
 })

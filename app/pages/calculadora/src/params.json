@@ -6,6 +6,7 @@
     "tasa_depreciacion_anual": 8,
     "hrs_vuelo_nacionales_anual": 180,
     "hrs_vuelo_extranjero_anual": 120,
+
     "costo_turbocina_mex_lt": 15,
     "costo_turbocina_usa_gal": 6.37,
     "turbocina_mex_lt_hora": 741,
@@ -22,6 +23,9 @@
     "seguro_aeronave_anual": 29881,
     "arrendamiento_anual": 235200,
     "precio_venta_aeronave": 2500000,
+
+    "horas_renta_sae": 0,
+    "precio_hr_renta": 0,
 
     "mtto_params": [
         {
