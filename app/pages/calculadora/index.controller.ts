@@ -1,4 +1,5 @@
 import { defineComponent, reactive, computed, watch, ref } from 'vue'
+import html2canvas from 'html2canvas'
 import jsonParams from './src/params.json'
 
 /**
@@ -665,6 +666,67 @@ export default defineComponent({
     }
 
     /**
+     * Descarga la página actual como imagen PNG
+     * Utiliza html2canvas para generar una captura de la página
+     */
+    const downloadAsImage = async () => {
+      try {
+        // Obtener el elemento que contiene toda la página
+        const element = document.querySelector('.page-wrapper') as HTMLElement
+        if (!element) {
+          console.error('No se encontró el elemento .page-wrapper')
+          return
+        }
+
+        // Ocultar elementos de UI antes de la captura
+        const downloadBox = document.querySelector('.download-box') as HTMLElement
+        const configToggle = document.querySelector('.configuration-toggle') as HTMLElement
+        
+        const originalDownloadDisplay = downloadBox?.style.display || ''
+        const originalConfigDisplay = configToggle?.style.display || ''
+        
+        if (downloadBox) downloadBox.style.display = 'none'
+        if (configToggle) configToggle.style.display = 'none'
+
+        // Configurar las opciones para html2canvas
+        const canvas = await html2canvas(element, {
+          backgroundColor: '#f5f5f5', // Respeta el color de fondo original
+          scale: 2, // Mayor resolución
+          useCORS: true,
+          allowTaint: true,
+          scrollX: 0,
+          scrollY: 0,
+          width: element.scrollWidth,
+          height: element.scrollHeight
+        })
+
+        // Restaurar la visibilidad de los elementos
+        if (downloadBox) downloadBox.style.display = originalDownloadDisplay
+        if (configToggle) configToggle.style.display = originalConfigDisplay
+
+        // Crear el enlace de descarga
+        const link = document.createElement('a')
+        link.download = `calculadora-aeronave-${new Date().toISOString().split('T')[0]}.png`
+        link.href = canvas.toDataURL('image/png')
+        
+        // Activar la descarga
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        
+      } catch (error) {
+        console.error('Error al descargar la imagen:', error)
+        
+        // Restaurar la visibilidad de los elementos en caso de error
+        const downloadBox = document.querySelector('.download-box') as HTMLElement
+        const configToggle = document.querySelector('.configuration-toggle') as HTMLElement
+        
+        if (downloadBox) downloadBox.style.display = ''
+        if (configToggle) configToggle.style.display = ''
+      }
+    }
+
+    /**
      * Calcula la inversión inicial requerida
      * Suma el precio de la aeronave más el costo anual de operación
      * @returns {number} Inversión inicial total
@@ -879,6 +941,7 @@ export default defineComponent({
       costosOpcionales,
       validationMessage,
       toggleConfiguration,
+      downloadAsImage,
       formattedCostoMttoInflacion,
       updateParam,
       updateCurrencyField,
