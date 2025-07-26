@@ -683,7 +683,7 @@
                   <div class="item-label">Tasa de Inflación Anual (USA)</div>
                   <div class="item-value">{{ formData.tasa_inflacion_usa }}%</div>
                 </div>
-                <div class="item" style="display: none;">
+                <div class="item" >
                   <div class="item-label">Costo Mtto Programado Total Anual con Inflación (USD)</div>
                   <div class="item-value">
                     ${{ formatCurrencyText(formattedCostoMttoInflacion) }}

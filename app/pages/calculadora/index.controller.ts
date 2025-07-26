@@ -107,8 +107,8 @@ export default defineComponent({
       programa_motor_anual: params.programa_motor_anual,
       montores_cantidad: params.montores_cantidad,
       
-      // Mantenimiento - Costo inicial calculado dinámicamente según las horas totales
-      costo_mtto_programado_total_anual: obtenerCostoMttoPorHoras(params.hrs_vuelo_nacionales_anual + params.hrs_vuelo_extranjero_anual),
+      // Mantenimiento - Costo inicial calculado dinámicamente según las horas totales + horas SAE
+      costo_mtto_programado_total_anual: obtenerCostoMttoPorHoras(params.hrs_vuelo_nacionales_anual + params.hrs_vuelo_extranjero_anual + params.horas_renta_sae),
       
       // Reservas de mantenimiento
       reserva_mtto_programado_anual: params.reserva_mtto_programado_anual,
@@ -168,8 +168,7 @@ export default defineComponent({
      */
     const actualizarHorasTotales = (horas: number) => {
       horasConfig.horas_totales = horas
-      // Actualizar el costo de mantenimiento programado según las horas seleccionadas
-      formData.costo_mtto_programado_total_anual = obtenerCostoMttoPorHoras(horas)
+      // El costo de mantenimiento se actualizará automáticamente a través del watcher
       
       // Validar y ajustar Horas Renta SAE si es necesario
       const maxHoras = getMaxHoras()
@@ -284,6 +283,22 @@ export default defineComponent({
     const calc_reserva_mtto_total_anual = computed(() => {
       return formData.reserva_mtto_programado_anual + calc_reserva_mtto_discrepancias_anual.value + calc_reserva_mtto_interiores_anual.value
     })
+
+    /**
+     * Calcula el costo de mantenimiento programado basado en horas totales + horas SAE
+     * @returns {number} Costo de mantenimiento programado
+     */
+    const calc_costo_mtto_programado = computed(() => {
+      const horasTotales = horasConfig.horas_totales || 0
+      const horasRentaSae = formData.horas_renta_sae || 0
+      const horasCompletas = horasTotales + horasRentaSae
+      return obtenerCostoMttoPorHoras(horasCompletas)
+    })
+
+    // Watcher para actualizar automáticamente el costo de mantenimiento
+    watch([() => horasConfig.horas_totales, () => formData.horas_renta_sae], () => {
+      formData.costo_mtto_programado_total_anual = calc_costo_mtto_programado.value
+    }, { immediate: true })
 
     /**
      * Calcula el costo total de mantenimiento programado con inflación aplicada
@@ -839,6 +854,7 @@ export default defineComponent({
       formattedData,
       horasConfig,
       horasOpciones,
+      calc_costo_mtto_programado,
       showConfiguration,
       costosOpcionales,
       validationMessage,
