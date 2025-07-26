@@ -849,6 +849,26 @@ export default defineComponent({
       return beneficio_total
     })
 
+    /**
+     * Calcula la rentabilidad del paquete de horas
+     * @returns {number} Rentabilidad del paquete de horas
+     */
+    const calc_rentabilidad_paquete_hrs = computed(() => {
+      const diferencia = calc_diferencia_paquete_hrs_inversion.value
+      const rentabilidad = (diferencia / paqueteHrsVueloTotal.value) * 100
+      return Math.round(rentabilidad)
+    })
+
+    /**
+     * Calcula la rentabilidad del paquete de horas (Contemplando beneficio fiscal)
+     * @returns {number} Rentabilidad del paquete de horas
+     */
+    const calc_rentabilidad_paquete_hrs_beneficio_fiscal = computed(() => {
+      const diferencia = calc_diferencia_paquete_hrs_inversion_beneficio_fiscal.value
+      const rentabilidad = (diferencia / paqueteHrsVueloTotal.value) * 100
+      return Math.round(rentabilidad)
+    })
+
     return {
       formData,
       formattedData,
@@ -892,7 +912,9 @@ export default defineComponent({
       actualizarPorcentaje,
       actualizarHorasTotales,
       calc_diferencia_paquete_hrs_inversion_beneficio_fiscal,
-      calc_inversion_final_beneficio_fiscal
+      calc_inversion_final_beneficio_fiscal,
+      calc_rentabilidad_paquete_hrs,
+      calc_rentabilidad_paquete_hrs_beneficio_fiscal
     }
   },
 })

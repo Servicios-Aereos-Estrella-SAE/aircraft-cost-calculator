@@ -93,6 +93,38 @@
 
           <div class="indicator-card">
             <div class="indicator-content">
+              <div class="indicator-label">Inversión Inicial</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_inversion_inicial) }}</div>
+              <div class="indicator-subtitle">Aeronave + Gastos primer año</div>
+            </div>
+          </div>
+
+          <div class="indicator-card">
+            <div class="indicator-content">
+              <div class="indicator-label">Tiempo de inversión</div>
+              <div class="indicator-value">{{ formData.anos_inversion }} Años</div>
+            </div>
+          </div>
+
+          <div class="indicator-card">
+            <div class="indicator-content">
+              <div class="indicator-label">Inversión total proyectada</div>
+              <div class="indicator-value">USD {{ formatCurrencyText(calc_inversion_final) }}</div>
+              <div v-if="calc_rentabilidad_paquete_hrs > 0 || calc_rentabilidad_paquete_hrs_beneficio_fiscal > 0" class="indicator-subtitle success">
+                <span>
+                  {{ calc_rentabilidad_paquete_hrs > 0 ? calc_rentabilidad_paquete_hrs : 0 }}%
+                </span>
+                a
+                <span>
+                  {{ calc_rentabilidad_paquete_hrs_beneficio_fiscal > 0 ? calc_rentabilidad_paquete_hrs_beneficio_fiscal : 0 }}%
+                </span>
+                <span>Más rentable que un paquete de horas</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="indicator-card">
+            <div class="indicator-content">
               <div class="indicator-label">Resumen de Horas de Vuelo</div>
               <div class="hours-summary-content">
                 <div class="item-value">
@@ -113,28 +145,6 @@
                     formData.anos_inversion }} horas</span>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-content">
-              <div class="indicator-label">Inversión Inicial</div>
-              <div class="indicator-value">USD {{ formatCurrencyText(calc_inversion_inicial) }}</div>
-              <div class="indicator-subtitle">Aeronave + Gastos primer año</div>
-            </div>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-content">
-              <div class="indicator-label">Tiempo de inversión</div>
-              <div class="indicator-value">{{ formData.anos_inversion }} Años</div>
-            </div>
-          </div>
-
-          <div class="indicator-card">
-            <div class="indicator-content">
-              <div class="indicator-label">Inversión total proyectada</div>
-              <div class="indicator-value">USD {{ formatCurrencyText(calc_inversion_final) }}</div>
             </div>
           </div>
         </div>
